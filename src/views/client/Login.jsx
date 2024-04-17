@@ -1,7 +1,13 @@
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    // Aquí puedes agregar la lógica de autenticación
+    // Después de la autenticación exitosa, redirige al Dashboard
+    navigate('/dashboard');
+  };
   return (
     <section className="h-screen bg-[#f5f5f5] flex items-center justify-center">
       <div className="container h-full p-10">
@@ -44,6 +50,7 @@ const Login = () => {
                         <button
                           className="mt-8 inline-block w-full rounded px-6 pb-2 pt-2.5 text-sm font-medium uppercase leading-normal text-white bg-[#F6BD43] hover:bg-amber-500"
                           type="button"
+                          onClick={handleLogin}
                         >
                           Iniciar sesión
                         </button>
