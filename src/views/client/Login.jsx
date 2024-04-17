@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import setupWebSocket from '../../components/socket';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,6 +20,12 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+
+         setupWebSocket((data) => {
+          // Función para manejar los datos recibidos del WebSocket
+          // Aquí puedes hacer lo que necesites con los datos recibidos
+          console.log('Datos recibidos del WebSocket:', data);
+        });
         // Almacena el token en el localStorage
         localStorage.setItem('token', data.token);
         // Redirige al Dashboard
