@@ -1,13 +1,37 @@
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [correo, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
-  const handleLogin = () => {
-    // Aquí puedes agregar la lógica de autenticación
-    // Después de la autenticación exitosa, redirige al Dashboard
-    navigate('/dashboard');
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ correo, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Almacena el token en el localStorage
+        localStorage.setItem('token', data.token);
+        // Redirige al Dashboard
+        navigate('/dashboard');
+      } else {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      setError(error.message);
+    }
   };
+
   return (
     <section className="h-screen bg-[#f5f5f5] flex items-center justify-center">
       <div className="container h-full p-10">
@@ -21,6 +45,7 @@ const Login = () => {
                       <h4 className="mb-12 mt-1 pb-1 text-3xl font-semibold">
                         Inicio de Sesión
                       </h4>
+                      {error && <p className="text-red-500">{error}</p>}
                     </div>
 
                     <form>
@@ -30,8 +55,10 @@ const Login = () => {
                         </label>
                         <input
                           className="rounded border border-[#F6BD43] focus:border-2 focus:border-amber-500 focus:outline-none text-[#676767] px-2 p-2 "
-                          type="text"
-                          id="username"
+                          type="email"
+                          id="email"
+                          value={correo}
+                          onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
 
@@ -43,6 +70,8 @@ const Login = () => {
                           className="rounded border border-[#F6BD43] focus:border-2 focus:border-amber-500 focus:outline-none text-[#676767] px-2 p-2"
                           type="password"
                           id="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
                         />
                       </div>
 
@@ -58,7 +87,7 @@ const Login = () => {
                           to="/signin"
                           className="inline-block w-full text-center mt-4 text-sm text-[#676767] hover:text-custom-yellow"
                         >
-                          Olvide mi Contraseña
+                          Olvidé mi Contraseña
                         </Link>
                       </div>
                     </form>
