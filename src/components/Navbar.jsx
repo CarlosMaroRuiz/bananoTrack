@@ -6,19 +6,19 @@ const Navbar = () => {
   const [notificaciones, setNotificaciones] = useState([]);
 
   const handleUserClick = () => {
-    // Aquí puedes agregar la lógica cuando se hace clic en el icono de usuario
+    // Lógica cuando se hace clic en el icono de usuario
   };
 
   const handleBellClick = (e) => {
     e.stopPropagation();
-    setShowNotifications(true);
-    fetchNotificaciones();
+    setShowNotifications(!showNotifications);
+    if (!showNotifications) {
+      fetchNotificaciones();
+    }
   };
 
-  const handleOutsideClick = (e) => {
-    if (e.target === e.currentTarget) {
-      setShowNotifications(false);
-    }
+  const handleOutsideClick = () => {
+    setShowNotifications(false);
   };
 
   const fetchNotificaciones = () => {
@@ -97,21 +97,13 @@ const Navbar = () => {
       <div>
         <p className="text-left">Bienvenido 👋</p>
       </div>
-      <div className="flex items-center cursor-pointer ml-4">
-        <h1 className="text-xl font-bold">Finca El Paraíso</h1>
-      </div>
       <div className="flex items-center">
-        <div className="relative" onClick={handleOutsideClick}>
+        <div className="relative">
           <FaBell className="cursor-pointer" onClick={handleBellClick} />
           {showNotifications && (
-            <div className="modal absolute block bg-[#F6BD43] w-96 h-auto right-0 rounded-lg mt-2 z-10">
+            <div className="modal absolute block bg-[#F6BD43] w-96 h-auto right-0 rounded-lg mt-2 z-10" onClick={handleOutsideClick}>
               <div className="modal-content">
-                <span
-                  className="close cursor-pointer text-2xl ml-2"
-                  onClick={() => setShowNotifications(false)}
-                >
-                  &times;
-                </span>
+                <span className="close cursor-pointer text-2xl ml-2" onClick={() => setShowNotifications(false)}>&times;</span>
                 <h2 className="text-center m-auto mb-4">Notificaciones</h2>
                 <ul>
                   {notificaciones.map((notificacion) => (
@@ -123,14 +115,8 @@ const Navbar = () => {
                           <p>Estado: {notificacion.estado}</p>
                         </div>
                         <div className="flex items-center">
-                          <FaTrash
-                            className="cursor-pointer mr-2"
-                            onClick={() => handleDeleteNotification(notificacion.id)}
-                          />
-                          <FaCheck
-                            className="cursor-pointer"
-                            onClick={() => handleMarkAsRead(notificacion.id)}
-                          />
+                          <FaTrash className="cursor-pointer mr-2" onClick={() => handleDeleteNotification(notificacion.id)} />
+                          <FaCheck className="cursor-pointer" onClick={() => handleMarkAsRead(notificacion.id)} />
                         </div>
                       </div>
                     </li>
@@ -140,7 +126,6 @@ const Navbar = () => {
             </div>
           )}
         </div>
-
         <div className="flex items-center cursor-pointer" onClick={handleUserClick}>
           <FaUser className="ml-4 mr-2" />
           <p>Alejandro</p>

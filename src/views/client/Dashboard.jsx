@@ -1,27 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
-import { FaSun, FaTint, FaFilePdf } from 'react-icons/fa'; // Importa FaFilePdf de FontAwesome
+import { FaSun, FaTint, FaFilePdf } from 'react-icons/fa';
 import Chart from 'chart.js/auto';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
 import CarouselComponent from '../../components/Carousel';
-import setupWebSocket from '../../components/socket'; // Importa la función setupWebSocket
-import ReportGenerator from '../../components/reporte'; // Importa el componente ReportGenerator
+import setupWebSocket from '../../components/socket';
+import ReportGenerator from '../../components/reporte';
 
 const Dashboard = () => {
   const chartRef = useRef(null);
-  const humidityChartRef = useRef(null); // Ref para la gráfica de humedad
+  const humidityChartRef = useRef(null);
   const [temperatureData, setTemperatureData] = useState([]);
   const [humidityData, setHumidityData] = useState([]);
-  const [luzData, setluzData] = useState([]);
-  const [reportData] = useState([]); // Agrega el estado para los datos del reporte
+  const [luzData, setLuzData] = useState([]);
+  const [distanceData, setDistanceData] = useState([]);
+  const [reportData] = useState([]);
+  const [showAddNotificationModal, setShowAddNotificationModal] = useState(false);
+  const [notificationType, setNotificationType] = useState('');
+  const [notificationDescription, setNotificationDescription] = useState('');
 
   useEffect(() => {
     const ws = setupWebSocket((data) => {
-      // Recibe los datos del WebSocket y actualiza el estado
       console.log('Datos recibidos del WebSocket:', data);
       setTemperatureData(data);
       setHumidityData(data);
-      setluzData(data);
+      setLuzData(data);
+      setDistanceData(data);
     });
 
     return () => {
@@ -35,7 +39,6 @@ const Dashboard = () => {
     if (chartRef.current && temperatureData.length > 0) {
       const ctx = chartRef.current.getContext('2d');
   
-      // Crea una nueva instancia de Chart si hay datos disponibles
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -69,7 +72,6 @@ const Dashboard = () => {
     }
   
     return () => {
-      // Destruye la instancia de Chart en la función de limpieza
       if (chartInstance) {
         chartInstance.destroy();
       }
@@ -82,7 +84,6 @@ const Dashboard = () => {
     if (humidityChartRef.current && humidityData.length > 0) {
       const ctx = humidityChartRef.current.getContext('2d');
   
-      // Crea una nueva instancia de Chart si hay datos disponibles
       humidityChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -114,13 +115,55 @@ const Dashboard = () => {
     }
   
     return () => {
-      // Destruye la instancia de Chart en la función de limpieza
       if (humidityChartInstance) {
         humidityChartInstance.destroy();
       }
     };
   }, [humidityData]);
-  
+
+  const handleAddNotification = () => {
+    setShowAddNotificationModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowAddNotificationModal(false);
+    // Limpiar los campos del modal cuando se cierra
+    setNotificationType('');
+    setNotificationDescription('');
+  };
+
+  const handleSendNotification = () => {
+    // Lógica para enviar la notificación a la base de datos con el token
+    console.log('Enviar notificación:', notificationType, notificationDescription);
+    const token = localStorage.getItem('token');
+
+    fetch('http://localhost:3000/notificaciones', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        tipo: notificationType,
+        descripcion: notificationDescription,
+      }),
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log('Notificación enviada exitosamente');
+        alert('¡Notificación enviada exitosamente!');
+        // Aquí puedes realizar cualquier acción adicional después de enviar la notificación
+      } else {
+        console.error('Error al enviar la notificación');
+      }
+    })
+    .catch(error => {
+      console.error('Error de red:', error);
+    });
+
+    // Cierra el modal después de enviar la notificación
+    handleModalClose();
+  };
 
   return (
     <div className="flex h-screen relative bg-gray-200">
@@ -137,6 +180,20 @@ const Dashboard = () => {
                   <FaFilePdf />
                 </div>
               </div>
+              <button onClick={handleAddNotification} className="mt-10 bg-blue-500 text-white px-3 py-1 rounded-md">Agregar Notificación</button>
+              {showAddNotificationModal && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+                  <div className="bg-white p-8 rounded-md">
+                    <h2 className="text-xl font-bold mb-4">Agregar Notificación</h2>
+                    <input type="text" placeholder="Tipo" value={notificationType} onChange={(e) => setNotificationType(e.target.value)} className="block w-full border-gray-300 rounded-md p-2 mb-2" />
+                    <textarea placeholder="Descripción" value={notificationDescription} onChange={(e) => setNotificationDescription(e.target.value)} className="block w-full border-gray-300 rounded-md p-2 mb-2"></textarea>
+                    <div className="flex justify-end">
+                      <button onClick={handleModalClose} className="bg-gray-300 text-gray-800 px-3 py-1 rounded-md mr-2">Cancelar</button>
+                      <button onClick={handleSendNotification} className="bg-blue-500 text-white px-3 py-1 rounded-md">Enviar</button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="bg-white p-4 rounded-xl h-64">
               <canvas ref={humidityChartRef} style={{ maxWidth: '100%', maxHeight: '100%' }} />
@@ -163,6 +220,25 @@ const Dashboard = () => {
                 <p className="text-lg">{humidityData.length > 0 ? humidityData[humidityData.length - 1].humedad : 'N/A'}</p>
               </div>
             </div>
+          </div>
+          <div className="bg-white p-4 rounded-xl">
+            <h2 className="text-xl font-bold mb-4">Últimos 10 datos de distancia:</h2>
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="border px-4 py-2">Fecha</th>
+                  <th className="border px-4 py-2">Distancia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {distanceData.slice(0, 10).map((item, index) => (
+                  <tr key={index}>
+                    <td className="border px-4 py-2">{item.fecha}</td>
+                    <td className="border px-4 py-2">{item.distancia}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
