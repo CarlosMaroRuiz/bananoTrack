@@ -97,6 +97,9 @@ const Navbar = () => {
       <div>
         <p className="text-left">Bienvenido 👋</p>
       </div>
+      <div>
+      <p className="text-left font-bold text-lg">Finca El Paraíso</p>
+    </div>
       <div className="flex items-center">
         <div className="relative">
           <FaBell className="cursor-pointer" onClick={handleBellClick} />
