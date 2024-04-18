@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { FaSun, FaTint } from 'react-icons/fa'; // Importa los íconos de FontAwesome
 import Chart from 'chart.js/auto';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
@@ -9,12 +10,17 @@ const Dashboard = () => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
   const [temperatureData, setTemperatureData] = useState([]);
+  const [humidityData, setHumidityData] = useState([]);
+  const [luzData, setluzData] = useState([]);
+
 
   useEffect(() => {
     const ws = setupWebSocket((data) => {
       // Recibe los datos del WebSocket y actualiza el estado
       console.log('Datos recibidos del WebSocket:', data);
       setTemperatureData(data);
+      setHumidityData(data);
+      setluzData(data);
     });
 
     return () => {
@@ -34,7 +40,7 @@ const Dashboard = () => {
           labels: temperatureData.map(item => item.fecha), // Utiliza las fechas como etiquetas en el eje x
           datasets: [
             {
-              label: 'Temperature (°C)',
+              label: 'Temperatura (°C)',
               data: temperatureData.map(item => item.temperatura), // Utiliza los datos de temperatura
               backgroundColor: 'rgba(75, 192, 192, 0.2)',
               borderColor: 'rgba(75, 192, 192, 1)',
@@ -49,7 +55,7 @@ const Dashboard = () => {
               beginAtZero: true,
               title: {
                 display: true,
-                text: 'Temperature (°C)',
+                text: 'Temperatura (°C)',
               },
             },
             x: {
@@ -77,11 +83,27 @@ const Dashboard = () => {
           <div className="bg-white p-2 rounded-xl flex-grow" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '0', width: '100%' }}>
   <canvas ref={chartRef} style={{ maxWidth: '110%', maxHeight: '110%' }} />
 </div>
+<div className="bg-white p-4 rounded-xl flex justify-center">
+  <div className="bg-blue-200 p-4 rounded-xl flex items-center justify-center text-center w-1/2 mx-4">
+    <FaSun className="text-6xl text-yellow-500 mb-4 mr-4" /> {/* Ícono de Luz */}
+    <div>
+      <h3 className="text-2xl font-bold">Luminosidad</h3>
+      <p className="text-lg">{luzData.length > 0 ? luzData[luzData.length - 1].luz : 'N/A'}</p>
+    </div>
+  </div>
+  <div className="bg-yellow-200 p-4 rounded-xl flex items-center justify-center text-center w-1/2 mx-4">
+    <FaTint className="text-6xl text-blue-500 mb-4 mr-4" /> {/* Ícono de Gotas de Agua */}
+    <div>
+      <h3 className="text-2xl font-bold">Humedad</h3>
+      <p className="text-lg">{humidityData.length > 0 ? humidityData[humidityData.length - 1].humedad : 'N/A'}</p>
+    </div>
+  </div>
+</div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white p-4 rounded-xl">Columna 1</div>
-            <div className="bg-white p-4 rounded-xl">Columna 2</div>
-          </div>
+
+
+
+
         </div>
       </div>
     </div>
