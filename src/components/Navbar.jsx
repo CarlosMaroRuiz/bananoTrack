@@ -23,7 +23,7 @@ const Navbar = () => {
 
   const fetchNotificaciones = () => {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:3000/notificaciones', {
+    fetch('http://3.215.18.246:3000/notificaciones', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -42,7 +42,7 @@ const Navbar = () => {
     console.log('Eliminar notificación con ID:', id);
 
     const token = localStorage.getItem('token');
-    fetch(`http://localhost:3000/notificaciones/${id}`, {
+    fetch(`http://3.215.18.246:3000/notificaciones/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ const Navbar = () => {
     console.log('Marcar notificación como leída con ID:', id);
 
     const token = localStorage.getItem('token');
-    fetch(`http://localhost:3000/notificaciones/${id}`, {
+    fetch(`http://3.215.18.246:3000/notificaciones/${id}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,

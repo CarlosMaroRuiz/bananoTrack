@@ -1,6 +1,6 @@
 // websocket.js
 const setupWebSocket = (setRacimos) => {
-  const ws = new WebSocket('ws://localhost:4000');
+  const ws = new WebSocket('ws://3.215.18.246:4000');
 
   ws.onopen = () => {
     console.log('Conexión establecida con el servidor WebSocket');
