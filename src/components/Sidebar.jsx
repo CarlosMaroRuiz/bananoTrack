@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import {
   FaHome,
-  FaInfo,
-  FaServicestack,
-  FaEnvelope,
   FaBars,
   FaTimes, // Importe el icono FaTimes
 } from 'react-icons/fa';
@@ -35,27 +32,6 @@ const Sidebar = () => {
         >
           <FaHome />
           {isOpen && <span>Home</span>}
-        </a>
-        <a
-          href="#"
-          className="flex items-center space-x-2 py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-        >
-          <FaInfo />
-          {isOpen && <span>About</span>}
-        </a>
-        <a
-          href="#"
-          className="flex items-center space-x-2 py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-        >
-          <FaServicestack />
-          {isOpen && <span>Services</span>}
-        </a>
-        <a
-          href="#"
-          className="flex items-center space-x-2 py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-        >
-          <FaEnvelope />
-          {isOpen && <span>Contact</span>}
         </a>
       </nav>
     </div>
