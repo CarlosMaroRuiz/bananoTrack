@@ -1,9 +1,6 @@
 import { useState } from 'react';
-import {
-  FaHome,
-  FaBars,
-  FaTimes, // Importe el icono FaTimes
-} from 'react-icons/fa';
+import { FaHome, FaBars, FaTimes, FaThermometer, FaTint } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; 
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,23 +13,25 @@ const Sidebar = () => {
     >
       {isOpen ? (
         <div className="flex justify-between items-center">
-          {' '}
-          {/* Añadir un div para alinear los elementos */}
           <h1 className="text-xl font-extrabold">Dashboard</h1>
-          <FaTimes onClick={() => setIsOpen(false)} />{' '}
-          {/* Añadir el icono FaTimes que al hacer clic establece isOpen en false */}
+          <FaTimes onClick={() => setIsOpen(false)} />
         </div>
       ) : (
         <FaBars onClick={() => setIsOpen(true)} />
       )}
       <nav>
-        <a
-          href="#"
-          className="flex items-center space-x-2 py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-        >
+        <Link to="/dashboard" className="flex items-center space-x-2 py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
           <FaHome />
           {isOpen && <span>Home</span>}
-        </a>
+        </Link>
+        <Link to="/calor" className="flex items-center space-x-2 py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          <FaThermometer />
+          {isOpen && <span>Datos de Calor</span>}
+        </Link>
+        <Link to="/humedad" className="flex items-center space-x-2 py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          <FaTint />
+          {isOpen && <span>Datos de Humedad</span>}
+        </Link>
       </nav>
     </div>
   );

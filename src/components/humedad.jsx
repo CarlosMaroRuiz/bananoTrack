@@ -81,19 +81,19 @@ const Mapas = () => {
       <div className="flex-grow overflow-auto p-4 relative h-full">
         <Navbar />
         <div className="grid grid-cols-2 gap-4 mt-4 h-full">
-          <div className="bg-white p-4 rounded-xl flex flex-col items-center justify-center h-full border-blue-500 border shadow-lg">
-            <h1 className="text-3xl mb-4">ENFERMEDADES O PLAGAS</h1>
-            <img src={imagenEnfermedades} alt="Imagen de enfermedades o plagas" className="my-4 max-w-full" />
-            <ul className="text-justify">
+          <div className="bg-white p-4 rounded-xl flex flex-col items-center justify-center h-full border-blue-500 border">
+            <h1>ENFERMEDADES O PLAGAS</h1>
+            <img src={imagenEnfermedades} alt="Imagen de enfermedades o plagas" className="my-4" />
+            <ul>
               {enfermedades.map((enfermedad, index) => (
                 <li key={index}>{enfermedad}</li>
               ))}
             </ul>
           </div>
-          <div className="bg-white p-4 rounded-xl flex flex-col items-center justify-center h-full border-blue-500 border shadow-lg">
-            <h1 className="text-3xl mb-4">RECOMENDACIONES PARA NO SER AFECTADO MUCHO</h1>
-            <img src={imagenRecomendaciones} alt="Imagen de recomendaciones" className="my-4 max-w-full" />
-            <ul className="text-justify">
+          <div className="bg-white p-4 rounded-xl flex flex-col items-center justify-center h-full border-blue-500 border">
+            <h1>RECOMENDACIONES PARA NO SER AFECTADO MUCHO</h1>
+            <img src={imagenRecomendaciones} alt="Imagen de recomendaciones" className="my-4" />
+            <ul>
               {recomendaciones.map((recomendacion, index) => (
                 <li key={index}>{recomendacion}</li>
               ))}

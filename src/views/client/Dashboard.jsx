@@ -137,7 +137,7 @@ const Dashboard = () => {
     console.log('Enviar notificación:', notificationType, notificationDescription);
     const token = localStorage.getItem('token');
 
-    fetch('http://3.215.18.246:3000/notificaciones', {
+    fetch('http://localhost:3000/notificaciones', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

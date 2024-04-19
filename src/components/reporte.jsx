@@ -14,17 +14,17 @@ const CombinedComponent = () => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
       try {
-        const temperaturaResponse = await fetch('http://3.215.18.246:3000/racimos/temperatura', {
+        const temperaturaResponse = await fetch('http://localhost:3000/racimos/temperatura', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
-        const humedadResponse = await fetch('http://3.215.18.246:3000/racimos/humedad', {
+        const humedadResponse = await fetch('http://localhost:3000/racimos/humedad', {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
         });
-        const luminosidadResponse = await fetch('http://3.215.18.246:3000/racimos/luz', {
+        const luminosidadResponse = await fetch('http://localhost:3000/racimos/luz', {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
