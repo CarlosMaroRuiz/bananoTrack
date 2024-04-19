@@ -14,7 +14,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/calor" element={<Mapas />} />
-          <Route path="/humedad" element={<Humedad />} />; 
+          <Route path="/humedad" element={<Humedad />} />
         </Routes>
       </div>
     </Router>
