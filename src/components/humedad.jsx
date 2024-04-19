@@ -10,7 +10,7 @@ const Humedad = () => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch('http://localhost:3000/racimos/humedad', {
+        const response = await fetch('http://3.215.18.246:3000/racimos/humedad', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
