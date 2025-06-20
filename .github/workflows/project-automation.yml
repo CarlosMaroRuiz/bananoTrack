@@ -1,0 +1,63 @@
+name: bananoTrack Project Automation
+
+on:
+  issues:
+    types: [assigned, unassigned, closed, reopened]
+  pull_request:
+    types: [opened, closed, merged, reopened]
+
+jobs:
+  move_assigned_issue:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'assigned'
+    steps:
+      - name: Move assigned issue to In Progress
+        uses: alex-page/github-project-automation-plus@v0.8.3
+        with:
+          project: 'testing'
+          column: 'In Progress'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  move_pr_opened:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened' && github.event_name == 'pull_request'
+    steps:
+      - name: Move PR to In Review
+        uses: alex-page/github-project-automation-plus@v0.8.3
+        with:
+          project: 'testing'
+          column: 'In Review'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  move_closed_issue:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: Move closed issue to Done
+        uses: alex-page/github-project-automation-plus@v0.8.3
+        with:
+          project: 'testing'
+          column: 'Done'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  move_merged_pr:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'merged' || (github.event.action == 'closed' && github.event.pull_request.merged == true)
+    steps:
+      - name: Move merged PR to Done
+        uses: alex-page/github-project-automation-plus@v0.8.3
+        with:
+          project: 'testing'
+          column: 'Done'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  move_reopened_issue:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'reopened'
+    steps:
+      - name: Move reopened issue to To Do
+        uses: alex-page/github-project-automation-plus@v0.8.3
+        with:
+          project: 'testing'
+          column: 'To Do'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
