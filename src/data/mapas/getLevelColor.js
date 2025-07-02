@@ -11,13 +11,12 @@ export const getLevelColorTemperature = (waterLevel) => {
          if (waterLevel >= 80) {
             waterLevelText = 'Alto';
             waterLevelColor = 'bg-red-500';
-            return waterLevelText,waterLevelColor
           } else if (waterLevel < 45) {
             waterLevelText = 'Bajo';
             waterLevelColor = 'bg-blue-500';
-            return waterLevelText,waterLevelColor
           } else {
             waterLevelText = 'Normal';
-            return waterLevelText,waterLevelColor
           }
+
+          return {waterLevelText,waterLevelColor}
 }
