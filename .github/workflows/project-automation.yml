@@ -5,6 +5,9 @@ on:
     types: [opened, assigned, closed, reopened]
   pull_request:
     types: [opened, closed]
+  push:
+    branches:
+      - testing  
 
 permissions:
   contents: read
@@ -71,3 +74,154 @@ jobs:
           script: |
             console.log('Item closed, should move to Done');
             console.log('Issue/PR number:', context.issue?.number || context.payload.pull_request?.number);
+
+  # Nuevo job para mover tarjeta #9 cuando se hace push a la rama testing
+  move_issue_9_on_push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/testing'
+    steps:
+      - name: Move issue #9 to In Progress
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            // Identificar el issue #9 y moverlo a "In progress"
+            const issueNumber = 9;
+            
+            // 1. Obtener información del proyecto y tarjeta
+            const projectQuery = `
+              query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $issueNumber) {
+                    projectItems(first: 10) {
+                      nodes {
+                        id
+                        project {
+                          id
+                          number
+                        }
+                        fieldValues(first: 8) {
+                          nodes {
+                            ... on ProjectV2ItemFieldSingleSelectValue {
+                              name
+                              field {
+                                ... on ProjectV2SingleSelectField {
+                                  id
+                                  name
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+            
+            const variables = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issueNumber: issueNumber
+            };
+            
+            console.log(`Consultando información para el issue #${issueNumber}`);
+            const result = await github.graphql(projectQuery, variables);
+            console.log('Resultado:', JSON.stringify(result, null, 2));
+            
+            // 2. Actualizar el estado a "In progress"
+            if (result.repository.issue.projectItems.nodes.length > 0) {
+              const projectItem = result.repository.issue.projectItems.nodes[0];
+              const projectId = projectItem.project.id;
+              const itemId = projectItem.id;
+              
+              // Buscar el campo de estado
+              let statusFieldId = null;
+              for (const node of projectItem.fieldValues.nodes) {
+                if (node.field && node.field.name === 'Status') {
+                  statusFieldId = node.field.id;
+                  break;
+                }
+              }
+              
+              if (!statusFieldId) {
+                console.log('No se encontró el campo de estado (Status)');
+                return;
+              }
+              
+              // Obtener los valores posibles para el campo de estado
+              const optionsQuery = `
+                query($projectId: ID!, $fieldId: ID!) {
+                  project: node(id: $projectId) {
+                    ... on ProjectV2 {
+                      field(id: $fieldId) {
+                        ... on ProjectV2SingleSelectField {
+                          options {
+                            id
+                            name
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              const optionsVariables = {
+                projectId: projectId,
+                fieldId: statusFieldId
+              };
+              
+              console.log('Obteniendo opciones de estado');
+              const optionsResult = await github.graphql(optionsQuery, optionsVariables);
+              console.log('Opciones:', JSON.stringify(optionsResult, null, 2));
+              
+              // Buscar la opción "In progress"
+              let inProgressOptionId = null;
+              for (const option of optionsResult.project.field.options) {
+                if (option.name === 'In progress') {
+                  inProgressOptionId = option.id;
+                  break;
+                }
+              }
+              
+              if (!inProgressOptionId) {
+                console.log('No se encontró la opción "In progress"');
+                return;
+              }
+              
+              // Actualizar el estado
+              const updateMutation = `
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                  updateProjectV2ItemFieldValue(
+                    input: {
+                      projectId: $projectId,
+                      itemId: $itemId,
+                      fieldId: $fieldId,
+                      value: { 
+                        singleSelectOptionId: $optionId
+                      }
+                    }
+                  ) {
+                    projectV2Item {
+                      id
+                    }
+                  }
+                }
+              `;
+              
+              const updateVariables = {
+                projectId: projectId,
+                itemId: itemId,
+                fieldId: statusFieldId,
+                optionId: inProgressOptionId
+              };
+              
+              console.log('Actualizando estado a "In progress"');
+              const updateResult = await github.graphql(updateMutation, updateVariables);
+              console.log('Resultado de la actualización:', JSON.stringify(updateResult, null, 2));
+              console.log(`Issue #${issueNumber} movido a "In progress" exitosamente`);
+            } else {
+              console.log(`El issue #${issueNumber} no está en ningún proyecto`);
+            }
